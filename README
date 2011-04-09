@@ -1,0 +1,4 @@
+Simple program to set the genre in all mp3 files in a directory with the top-five tags from last.fm for that artist.
+
+Compile and run with sbt:
+sbt "run targetdirectory"
