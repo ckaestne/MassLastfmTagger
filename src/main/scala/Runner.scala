@@ -1,20 +1,53 @@
 import java.io.File
-import org.farng.mp3.{AbstractMP3Tag, MP3File}
-import org.jaudiotagger.audio.AudioFileIO
+import java.util.logging.{Level, Logger}
+import org.jaudiotagger.audio._
+import org.jaudiotagger.audio.mp3._
 import org.jaudiotagger.tag.FieldKey
 
 
+object Runner  {
 
-object Runner extends Application {
+    def main(args: Array[String]) {
+        AudioFileIO.logger.setLevel(Level.WARNING)
+        if (args.size <= 0)
+            println("target file or directory as parameter required")
+        else
+            for (file <- args)
+                tag(new File(file))
+    }
 
 
-    println("hi")
+    def tagFile(file: File) {
+        val audio = AudioFileIO.read(file)
+        if (audio.isInstanceOf[MP3File]) {
+            val f = audio.asInstanceOf[MP3File]
+            val tag = f.getID3v2Tag();
+            val artist = tag.getFirst(FieldKey.ARTIST)
+            val oldGenre = tag.getFirst(FieldKey.GENRE)
+            println("old tag for " + artist + ": " + oldGenre)
+            val lastfmTags = TopTags.fetchTopTags(artist)
+            val tagStr = lastfmTags.take(5).mkString(", ")
+            println("new tag for " + artist + ": " + tagStr)
+            if (!lastfmTags.isEmpty && oldGenre != tagStr) {
+                tag.setField(FieldKey.GENRE, tagStr)
+                AudioFileIO.write(f)
+            }
+        }
+    }
 
-    val sourceFile = new File("src/test/resources/10 Suicide.mp3");
+    def tagDir(dir: File) {
+        if (dir.exists) {
+            for (file <- dir.listFiles)
+                tag(file)
+        }
+    }
 
-    val f = AudioFileIO.read(sourceFile);
-    val tag = f.getTag();
+    def tag(file: File) {
+        if (file.isFile)
+            tagFile(file)
+        else if (file.isDirectory)
+            tagDir(file)
+    }
 
 
-    println(tag.getFirst(FieldKey.ARTIST))
 }
