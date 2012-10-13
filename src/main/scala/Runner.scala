@@ -53,7 +53,9 @@ object Runner  {
     }
 
     def tag(file: File) {
-        if (file.isFile)
+        if (!file.exists)
+            println("file does not exist "+file)
+        else if (file.isFile)
             tagFile(file)
         else if (file.isDirectory)
             tagDir(file)
