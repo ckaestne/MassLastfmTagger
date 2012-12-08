@@ -8,7 +8,7 @@ object TopTags {
             "api_key=c561f0f547c3c57da054bdcdca3e4e5a&" +
             "artist="
 
-    def topTagsFor(artist: String) = baseURL + (URLEncoder encode artist)
+    def topTagsFor(artist: String) = baseURL + (URLEncoder.encode(artist,"UTF-8"))
 
 
     import scala.xml._;
