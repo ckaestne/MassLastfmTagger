@@ -44,6 +44,7 @@ object Runner  {
             else {
 	        println(artist + ": " + tagStr +" <- "+oldGenre)
                 tag.setField(FieldKey.GENRE, tagStr)
+		tag.setField(FieldKey.COMMENT, "")
                 AudioFileIO.write(f)
             }
         }
