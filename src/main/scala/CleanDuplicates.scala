@@ -14,13 +14,16 @@ object CleanDuplicates {
 
     def main(args: Array[String]) {
         val path = args(0)
-        val reallyDelete = if (args.size > 1) args(1)=="-d" else false
+        val reallyDelete = if (args.size > 1) args(1) == "-d" else false
 
-        clean(new File(path),reallyDelete)
+        if (!reallyDelete)
+            println("Simulation only, use -d to really delete")
+
+        clean(new File(path), reallyDelete)
 
     }
 
-    def clean(dir: File, reallyDelete:Boolean) {
+    def clean(dir: File, reallyDelete: Boolean) {
         if (!dir.exists) return;
 
         //        println(dir)
@@ -29,7 +32,7 @@ object CleanDuplicates {
 
         for (subdir <- dir.listFiles)
             if (subdir.isDirectory)
-                clean(subdir,reallyDelete)
+                clean(subdir, reallyDelete)
 
         val files = dir.listFiles.filter(_.isFile)
         for (file <- files) {
