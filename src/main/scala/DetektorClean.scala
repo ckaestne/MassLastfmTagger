@@ -39,7 +39,7 @@ object DetektorClean {
             val f = audio.asInstanceOf[MP3File]
             val tag = f.getID3v2Tag()
             val n = file.getName
-            val artisttitle = n.take(n.lastIndexOf(".")).split("   ").map(_.trim)
+            val artisttitle = n.take(n.lastIndexOf(".")).split("   +").map(_.trim)
             if (artisttitle.size == 2) {
                 val artist = artisttitle(0)
                 val title = artisttitle(1)
@@ -47,12 +47,16 @@ object DetektorClean {
                 val tagStr = lastfmTags.take(5).mkString(", ")
 
                 println(s"$artist - $title: $tagStr")
-                tag.setField(FieldKey.GENRE, tagStr)
-                tag.setField(FieldKey.COMMENT, "")
-                tag.setField(FieldKey.ARTIST, artist)
-                tag.setField(FieldKey.TITLE, title)
-
-                AudioFileIO.write(f)
+                val oldArtist = tag.getFirst(FieldKey.ARTIST)
+                val oldTitle = tag.getFirst(FieldKey.TITLE)
+                val oldGenre = tag.getFirst(FieldKey.GENRE)
+                if (!(oldArtist == artist && oldTitle == title && oldGenre == tagStr)) {
+                    tag.setField(FieldKey.GENRE, tagStr)
+                    tag.setField(FieldKey.COMMENT, "")
+                    tag.setField(FieldKey.ARTIST, artist)
+                    tag.setField(FieldKey.TITLE, title)
+                    AudioFileIO.write(f)
+                }
             } else {
                 println(s"File $n cannot be split in artist and title: $artisttitle")
             }
